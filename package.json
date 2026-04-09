@@ -1,0 +1,28 @@
+{
+  "name": "cse341-fitness-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itzfrey/cse341-fitness-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/itzfrey/cse341-fitness-tracker/issues"
+  },
+  "homepage": "https://github.com/itzfrey/cse341-fitness-tracker#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.4.1",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

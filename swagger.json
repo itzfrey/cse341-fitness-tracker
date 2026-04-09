@@ -1,0 +1,189 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Fitness Tracker API",
+    "description": "API for managing workouts and exercises",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/workouts/": {
+      "get": {
+        "description": "Get all workouts",
+        "responses": {
+          "200": { "description": "OK" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "description": "Create a new workout",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "Morning Run" },
+                "type": { "type": "string", "example": "Cardio" },
+                "duration": { "type": "number", "example": 30 },
+                "caloriesBurned": { "type": "number", "example": 300 },
+                "difficulty": { "type": "string", "example": "Medium" },
+                "muscleGroup": { "type": "string", "example": "Legs" },
+                "equipment": { "type": "string", "example": "None" },
+                "notes": { "type": "string", "example": "Felt great today" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/workouts/{id}": {
+      "get": {
+        "description": "Get a workout by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "description": "Update a workout by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "Morning Run" },
+                "type": { "type": "string", "example": "Cardio" },
+                "duration": { "type": "number", "example": 30 },
+                "caloriesBurned": { "type": "number", "example": 300 },
+                "difficulty": { "type": "string", "example": "Medium" },
+                "muscleGroup": { "type": "string", "example": "Legs" },
+                "equipment": { "type": "string", "example": "None" },
+                "notes": { "type": "string", "example": "Felt great today" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "delete": {
+        "description": "Delete a workout by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/exercises/": {
+      "get": {
+        "description": "Get all exercises",
+        "responses": {
+          "200": { "description": "OK" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "description": "Create a new exercise",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "Push Up" },
+                "category": { "type": "string", "example": "Strength" },
+                "description": { "type": "string", "example": "Upper body exercise" },
+                "isBodyweight": { "type": "boolean", "example": true }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" }
+        }
+      }
+    },
+    "/exercises/{id}": {
+      "get": {
+        "description": "Get an exercise by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "description": "Update an exercise by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "Push Up" },
+                "category": { "type": "string", "example": "Strength" },
+                "description": { "type": "string", "example": "Upper body exercise" },
+                "isBodyweight": { "type": "boolean", "example": true }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "delete": {
+        "description": "Delete an exercise by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    }
+  }
+}
