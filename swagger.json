@@ -5,7 +5,7 @@
     "description": "API for managing workouts and exercises",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "cse341-fitness-tracker-a9hm.onrender.com",
   "basePath": "/",
   "schemes": ["http"],
   "consumes": ["application/json"],
