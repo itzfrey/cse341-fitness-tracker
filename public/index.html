@@ -6,6 +6,39 @@
   <title>FitTrack API</title>
   <link rel="stylesheet" href="/styles/home.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .auth-btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      display: inline-block;
+    }
+    .auth-btn:hover { opacity: 0.85; }
+    .login-btn {
+      background: #24292e;
+      color: #ffffff;
+      border: 1px solid #555;
+    }
+    .logout-btn {
+      background: #e74c3c;
+      color: #ffffff;
+      border: none;
+    }
+    .user-greeting {
+      font-size: 14px;
+      font-weight: 500;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
   <div class="bg-shape shape1"></div>
@@ -13,12 +46,17 @@
   <div class="wrapper">
     <nav class="navbar">
       <div class="logo">FitTrack <span>API</span></div>
-      <div class="version">v1.0.0</div>
+      <div class="nav-right">
+        <div class="version">v2.0.0</div>
+        <div id="auth-status">
+          <!-- Filled by JS below -->
+        </div>
+      </div>
     </nav>
     <div class="hero">
       <div class="badge">🚀 Now Live on Render</div>
       <h1>Your Fitness Data,<br/><span>Powered by API</span></h1>
-      <p>A REST API for tracking workouts, exercises, goals and more. Built with Node.js, Express and MongoDB.</p>
+      <p>A REST API for tracking workouts, exercises, users, and goals. Built with Node.js, Express and MongoDB.</p>
     </div>
     <div class="cards">
       <a href="/api-docs" class="card card--primary">
@@ -48,14 +86,32 @@
         <div class="card-desc">Browse the full exercise library</div>
         <div class="card-arrow">→</div>
       </a>
+      <a href="/users" class="card">
+        <div class="card-top">
+          <span class="card-icon">👤</span>
+          <span class="card-tag">Collection</span>
+        </div>
+        <div class="card-title">Users</div>
+        <div class="card-desc">Manage user accounts via GitHub OAuth</div>
+        <div class="card-arrow">→</div>
+      </a>
+      <a href="/goals" class="card">
+        <div class="card-top">
+          <span class="card-icon">🎯</span>
+          <span class="card-tag">Collection</span>
+        </div>
+        <div class="card-title">Goals</div>
+        <div class="card-desc">Set and track your fitness goals</div>
+        <div class="card-arrow">→</div>
+      </a>
     </div>
     <div class="stats">
       <div class="stat">
-        <div class="stat-num">2</div>
+        <div class="stat-num">4</div>
         <div class="stat-label">Collections</div>
       </div>
       <div class="stat">
-        <div class="stat-num">10</div>
+        <div class="stat-num">20</div>
         <div class="stat-label">Endpoints</div>
       </div>
       <div class="stat">
@@ -69,5 +125,31 @@
     </div>
     <footer>Built with ❤ · CSE341 Final Project · 2026</footer>
   </div>
+
+  <script>
+    const authDiv = document.getElementById('auth-status');
+
+    fetch('/auth/status')
+      .then(res => res.json())
+      .then(data => {
+        if (data.loggedIn) {
+          // Show greeting + logout button
+          authDiv.innerHTML = `
+            <span class="user-greeting">👋 ${data.user.displayName}</span>
+            <a href="/auth/logout" class="auth-btn logout-btn">🚪 Logout</a>
+          `;
+        } else {
+          // Show login button
+          authDiv.innerHTML = `
+            <a href="/auth/github" class="auth-btn login-btn">🔐 Login with GitHub</a>
+          `;
+        }
+      })
+      .catch(() => {
+        authDiv.innerHTML = `
+          <a href="/auth/github" class="auth-btn login-btn">🔐 Login with GitHub</a>
+        `;
+      });
+  </script>
 </body>
 </html>

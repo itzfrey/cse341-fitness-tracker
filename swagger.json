@@ -2,17 +2,52 @@
   "swagger": "2.0",
   "info": {
     "title": "Fitness Tracker API",
-    "description": "API for managing workouts and exercises",
-    "version": "1.0.0"
+    "description": "API for managing workouts, exercises, users, and goals.\n\n**Authentication:** Login via GitHub at `/auth/github`, or use the API key below for Swagger testing.\n\nClick **Authorize** and enter your `API_KEY` value from your `.env` file.",
+    "version": "2.0.0"
   },
   "host": "cse341-fitness-tracker-a9hm.onrender.com",
   "basePath": "/",
   "schemes": ["https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "x-api-key"
+    }
+  },
   "paths": {
+    "/auth/github": {
+      "get": {
+        "description": "Initiate GitHub OAuth login — open this URL in your browser to log in",
+        "tags": ["Auth"],
+        "responses": {
+          "302": { "description": "Redirect to GitHub login page" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "description": "Log out the current user",
+        "tags": ["Auth"],
+        "responses": {
+          "302": { "description": "Redirect to home" }
+        }
+      }
+    },
+    "/auth/status": {
+      "get": {
+        "description": "Check if user is currently logged in",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Returns loggedIn status and user info" }
+        }
+      }
+    },
     "/workouts/": {
       "get": {
+        "tags": ["Workouts"],
         "description": "Get all workouts",
         "responses": {
           "200": { "description": "OK" },
@@ -20,7 +55,9 @@
         }
       },
       "post": {
-        "description": "Create a new workout",
+        "tags": ["Workouts"],
+        "description": "Create a new workout — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -28,12 +65,13 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": ["name", "type", "duration", "caloriesBurned", "difficulty", "muscleGroup"],
               "properties": {
                 "name": { "type": "string", "example": "Morning Run" },
                 "type": { "type": "string", "example": "Cardio" },
                 "duration": { "type": "number", "example": 30 },
                 "caloriesBurned": { "type": "number", "example": 300 },
-                "difficulty": { "type": "string", "example": "Medium" },
+                "difficulty": { "type": "string", "enum": ["Easy", "Medium", "Hard"], "example": "Medium" },
                 "muscleGroup": { "type": "string", "example": "Legs" },
                 "equipment": { "type": "string", "example": "None" },
                 "notes": { "type": "string", "example": "Felt great today" }
@@ -43,12 +81,14 @@
         ],
         "responses": {
           "201": { "description": "Created" },
-          "400": { "description": "Bad Request" }
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" }
         }
       }
     },
     "/workouts/{id}": {
       "get": {
+        "tags": ["Workouts"],
         "description": "Get a workout by ID",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
@@ -61,7 +101,9 @@
         }
       },
       "put": {
-        "description": "Update a workout by ID",
+        "tags": ["Workouts"],
+        "description": "Update a workout by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" },
           {
@@ -75,7 +117,7 @@
                 "type": { "type": "string", "example": "Cardio" },
                 "duration": { "type": "number", "example": 30 },
                 "caloriesBurned": { "type": "number", "example": 300 },
-                "difficulty": { "type": "string", "example": "Medium" },
+                "difficulty": { "type": "string", "enum": ["Easy", "Medium", "Hard"], "example": "Medium" },
                 "muscleGroup": { "type": "string", "example": "Legs" },
                 "equipment": { "type": "string", "example": "None" },
                 "notes": { "type": "string", "example": "Felt great today" }
@@ -86,10 +128,12 @@
         "responses": {
           "200": { "description": "OK" },
           "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" }
         }
       },
       "delete": {
+        "tags": ["Workouts"],
         "description": "Delete a workout by ID",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
@@ -104,6 +148,7 @@
     },
     "/exercises/": {
       "get": {
+        "tags": ["Exercises"],
         "description": "Get all exercises",
         "responses": {
           "200": { "description": "OK" },
@@ -111,7 +156,9 @@
         }
       },
       "post": {
-        "description": "Create a new exercise",
+        "tags": ["Exercises"],
+        "description": "Create a new exercise — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           {
             "name": "body",
@@ -119,6 +166,7 @@
             "required": true,
             "schema": {
               "type": "object",
+              "required": ["name", "category", "description"],
               "properties": {
                 "name": { "type": "string", "example": "Push Up" },
                 "category": { "type": "string", "example": "Strength" },
@@ -130,12 +178,14 @@
         ],
         "responses": {
           "201": { "description": "Created" },
-          "400": { "description": "Bad Request" }
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" }
         }
       }
     },
     "/exercises/{id}": {
       "get": {
+        "tags": ["Exercises"],
         "description": "Get an exercise by ID",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
@@ -148,7 +198,9 @@
         }
       },
       "put": {
-        "description": "Update an exercise by ID",
+        "tags": ["Exercises"],
+        "description": "Update an exercise by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" },
           {
@@ -169,10 +221,12 @@
         "responses": {
           "200": { "description": "OK" },
           "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" }
         }
       },
       "delete": {
+        "tags": ["Exercises"],
         "description": "Delete an exercise by ID",
         "parameters": [
           { "name": "id", "in": "path", "required": true, "type": "string" }
@@ -180,6 +234,227 @@
         "responses": {
           "200": { "description": "OK" },
           "400": { "description": "Bad Request" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/users/": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get all users — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "description": "Create a new user — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["githubId", "displayName"],
+              "properties": {
+                "githubId": { "type": "string", "example": "12345678" },
+                "displayName": { "type": "string", "example": "John Doe" },
+                "email": { "type": "string", "example": "john@example.com" },
+                "avatar": { "type": "string", "example": "https://avatars.githubusercontent.com/u/12345678" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "409": { "description": "Conflict - User already exists" }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get a user by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "description": "Update a user by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "displayName": { "type": "string", "example": "John Doe" },
+                "email": { "type": "string", "example": "john@example.com" },
+                "avatar": { "type": "string", "example": "https://avatars.githubusercontent.com/u/12345678" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "description": "Delete a user by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/goals/": {
+      "get": {
+        "tags": ["Goals"],
+        "description": "Get all goals — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": {
+          "200": { "description": "OK" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "post": {
+        "tags": ["Goals"],
+        "description": "Create a new goal — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["userId", "title", "type", "targetValue", "unit", "deadline"],
+              "properties": {
+                "userId": { "type": "string", "example": "64a1b2c3d4e5f6a7b8c9d0e1" },
+                "title": { "type": "string", "example": "Lose 10 lbs" },
+                "type": {
+                  "type": "string",
+                  "enum": ["Weight Loss", "Muscle Gain", "Endurance", "Flexibility", "General Fitness"],
+                  "example": "Weight Loss"
+                },
+                "targetValue": { "type": "number", "example": 10 },
+                "currentValue": { "type": "number", "example": 0 },
+                "unit": { "type": "string", "example": "lbs" },
+                "deadline": { "type": "string", "format": "date", "example": "2025-12-31" },
+                "status": {
+                  "type": "string",
+                  "enum": ["In Progress", "Completed", "Abandoned"],
+                  "example": "In Progress"
+                },
+                "notes": { "type": "string", "example": "Cutting carbs and jogging daily" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/goals/{id}": {
+      "get": {
+        "tags": ["Goals"],
+        "description": "Get a goal by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      },
+      "put": {
+        "tags": ["Goals"],
+        "description": "Update a goal by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string", "example": "Lose 10 lbs" },
+                "type": {
+                  "type": "string",
+                  "enum": ["Weight Loss", "Muscle Gain", "Endurance", "Flexibility", "General Fitness"]
+                },
+                "targetValue": { "type": "number", "example": 10 },
+                "currentValue": { "type": "number", "example": 3 },
+                "unit": { "type": "string", "example": "lbs" },
+                "deadline": { "type": "string", "format": "date", "example": "2025-12-31" },
+                "status": {
+                  "type": "string",
+                  "enum": ["In Progress", "Completed", "Abandoned"]
+                },
+                "notes": { "type": "string", "example": "Making good progress" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Not Found" }
+        }
+      },
+      "delete": {
+        "tags": ["Goals"],
+        "description": "Delete a goal by ID — requires login or API key",
+        "security": [{ "ApiKeyAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "type": "string" }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
           "404": { "description": "Not Found" },
           "500": { "description": "Internal Server Error" }
         }
