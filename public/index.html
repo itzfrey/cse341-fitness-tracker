@@ -6,39 +6,6 @@
   <title>FitTrack API</title>
   <link rel="stylesheet" href="/styles/home.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-  <style>
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .auth-btn {
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
-      display: inline-block;
-    }
-    .auth-btn:hover { opacity: 0.85; }
-    .login-btn {
-      background: #24292e;
-      color: #ffffff;
-      border: 1px solid #555;
-    }
-    .logout-btn {
-      background: #e74c3c;
-      color: #ffffff;
-      border: none;
-    }
-    .user-greeting {
-      font-size: 14px;
-      font-weight: 500;
-      color: #ccc;
-    }
-  </style>
 </head>
 <body>
   <div class="bg-shape shape1"></div>
@@ -126,30 +93,6 @@
     <footer>Built with ❤ · CSE341 Final Project · 2026</footer>
   </div>
 
-  <script>
-    const authDiv = document.getElementById('auth-status');
-
-    fetch('/auth/status')
-      .then(res => res.json())
-      .then(data => {
-        if (data.loggedIn) {
-          // Show greeting + logout button
-          authDiv.innerHTML = `
-            <span class="user-greeting">👋 ${data.user.displayName}</span>
-            <a href="/auth/logout" class="auth-btn logout-btn">🚪 Logout</a>
-          `;
-        } else {
-          // Show login button
-          authDiv.innerHTML = `
-            <a href="/auth/github" class="auth-btn login-btn">🔐 Login with GitHub</a>
-          `;
-        }
-      })
-      .catch(() => {
-        authDiv.innerHTML = `
-          <a href="/auth/github" class="auth-btn login-btn">🔐 Login with GitHub</a>
-        `;
-      });
-  </script>
+  <script src="/styles/home.js"></script>
 </body>
 </html>

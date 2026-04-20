@@ -11,54 +11,63 @@ const swaggerDocument = require('./swagger.json');
 const User = require('./models/user');
 
 const app = express();
+app.set('trust proxy', 1);
 
-// Debug logging
-console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Found' : 'NOT FOUND');
-console.log('PORT:', process.env.PORT ? 'Found' : 'NOT FOUND');
-console.log('GITHUB_CLIENT_ID:', process.env.GITHUB_CLIENT_ID ? 'Found' : 'NOT FOUND');
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://cse341-fitness-tracker-a9hm.onrender.com'
+];
 
 app.use(express.json());
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session - must come before passport
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'fitness-secret',
-    resave: true,
-    saveUninitialized: true
-  })
-);
+// Session
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fitness-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  }
+}));
 
-// Passport - must come after session
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ githubId: profile.id });
-        if (!user) {
-          user = await User.create({
-            githubId: profile.id,
-            displayName: profile.displayName || profile.username,
-            email: profile.emails?.[0]?.value || '',
-            avatar: profile.photos?.[0]?.value || ''
-          });
-        }
-        return done(null, user);
-      } catch (err) {
-        return done(err, null);
-      }
+// GitHub Strategy
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: process.env.GITHUB_CALLBACK_URL
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    let user = await User.findOne({ githubId: profile.id });
+    if (!user) {
+      user = await User.create({
+        githubId: profile.id,
+        displayName: profile.displayName || profile.username,
+        email: profile.emails?.[0]?.value || '',
+        avatar: profile.photos?.[0]?.value || ''
+      });
     }
-  )
-);
+    return done(null, user);
+  } catch (err) {
+    return done(err, null);
+  }
+}));
 
 passport.serializeUser((user, done) => done(null, user._id));
 passport.deserializeUser(async (id, done) => {
@@ -71,27 +80,28 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-// OAuth routes
-app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
-
-app.get(
-  '/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  swaggerOptions: {
+    withCredentials: true
   }
-);
+}));
 
+// Auth routes
+app.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+app.get('/auth/github/callback',
+  passport.authenticate('github', { failureRedirect: '/' }),
+  (req, res) => { res.redirect('/'); }
+);
 app.get('/auth/logout', (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
-    req.session.destroy();
-    res.redirect('/');
+    req.session.destroy((err) => {
+      if (err) return next(err);
+      res.clearCookie('connect.sid');
+      res.redirect('/');
+    });
   });
 });
-
 app.get('/auth/status', (req, res) => {
   if (req.isAuthenticated()) {
     res.status(200).json({ loggedIn: true, user: req.user });

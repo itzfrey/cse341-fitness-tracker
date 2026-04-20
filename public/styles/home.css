@@ -9,6 +9,39 @@ body {
   position: relative;
 }
 
+/* Navbar Auth */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.auth-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: inline-block;
+}
+.auth-btn:hover { opacity: 0.85; }
+.login-btn {
+  background: #24292e;
+  color: #ffffff;
+  border: 1px solid #555;
+}
+.logout-btn {
+  background: #e74c3c;
+  color: #ffffff;
+  border: none;
+}
+.user-greeting {
+  font-size: 14px;
+  font-weight: 500;
+  color: #cccccc;
+}
+
 /* Background blobs */
 .bg-shape {
   position: fixed;

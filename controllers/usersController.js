@@ -24,13 +24,9 @@ const getUserById = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { googleId, displayName, email } = req.body;
-    if (!googleId || !displayName || !email) {
-      return res.status(400).json({ message: 'Missing required fields: googleId, displayName, email' });
-    }
-    const existing = await User.findOne({ googleId });
-    if (existing) {
-      return res.status(409).json({ message: 'User with this googleId already exists' });
+    const { githubId, displayName } = req.body;
+    if (!githubId || !displayName) {
+      return res.status(400).json({ message: 'Missing required fields: githubId, displayName' });
     }
     const user = new User(req.body);
     const saved = await user.save();

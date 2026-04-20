@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { isAuthenticated } = require('../middleware/auth');
+const { isAuthenticated, isAuthenticatedBrowser } = require('../middleware/authenticate');
 const {
   getAllUsers,
   getUserById,
@@ -9,8 +9,8 @@ const {
   deleteUser
 } = require('../controllers/usersController');
 
-router.get('/', getAllUsers);
-router.get('/:id', getUserById);
+router.get('/', isAuthenticatedBrowser, getAllUsers);
+router.get('/:id', isAuthenticatedBrowser, getUserById);
 router.post('/', isAuthenticated, createUser);
 router.put('/:id', isAuthenticated, updateUser);
 router.delete('/:id', isAuthenticated, deleteUser);

@@ -24,11 +24,9 @@ const getGoalById = async (req, res) => {
 
 const createGoal = async (req, res) => {
   try {
-    const { userId, title, type, targetValue, unit, deadline } = req.body;
-    if (!userId || !title || !type || !targetValue || !unit || !deadline) {
-      return res.status(400).json({
-        message: 'Missing required fields: userId, title, type, targetValue, unit, deadline'
-      });
+    const { title, type, target, unit, deadline } = req.body;
+    if (!title || !type || !target || !unit || !deadline) {
+      return res.status(400).json({ message: 'Missing required fields: title, type, target, unit, deadline' });
     }
     const goal = new Goal(req.body);
     const saved = await goal.save();

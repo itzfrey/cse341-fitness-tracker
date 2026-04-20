@@ -2,23 +2,13 @@ const mongoose = require('mongoose');
 
 const goalSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
     title: { type: String, required: true },
-    type: {
-      type: String,
-      required: true,
-      enum: ['Weight Loss', 'Muscle Gain', 'Endurance', 'Flexibility', 'General Fitness']
-    },
-    targetValue: { type: Number, required: true, min: 0 },
-    currentValue: { type: Number, default: 0, min: 0 },
+    type: { type: String, required: true },
+    target: { type: Number, required: true },
+    current: { type: Number, default: 0 },
     unit: { type: String, required: true },
     deadline: { type: Date, required: true },
-    status: {
-      type: String,
-      default: 'In Progress',
-      enum: ['In Progress', 'Completed', 'Abandoned']
-    },
-    notes: { type: String, default: '' }
+    achieved: { type: Boolean, default: false }
   },
   { timestamps: true, versionKey: false }
 );
